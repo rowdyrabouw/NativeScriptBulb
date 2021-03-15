@@ -31,12 +31,16 @@
     "@nativescript/angular": "~11.0.0",
     "@nativescript/core": "~7.1.0",
     "@nativescript/theme": "~3.0.0",
+    "@sergeymell/nativescript-color-wheel": "^1.0.15",
+    "nativescript-speech-recognition": "^2.0.0",
     "reflect-metadata": "~0.1.12",
     "rxjs": "^6.6.0",
     "zone.js": "~0.11.1"
   },
   "devDependencies": {
     "@angular/compiler-cli": "~11.0.0",
+    "@nativescript/android": "7.0.1",
+    "@nativescript/ios": "7.2.0",
     "@nativescript/types": "~7.0.0",
     "@nativescript/webpack": "~4.0.0",
     "@ngtools/webpack": "~11.0.0",
