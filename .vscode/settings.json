@@ -1,0 +1,6 @@
+{
+  "files.autoSave": "onFocusChange",
+  "prettier.printWidth": 250,
+  "editor.formatOnSave": true,
+  "editor.fontSize": 14
+}
