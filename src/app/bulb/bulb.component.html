@@ -1,8 +1,9 @@
-<StackLayout>
-    <ColorWheel width="400" height="400" (colorSelect)="onColorSelected($event)"></ColorWheel>
+<StackLayout horizontalAlignment="center">
+    <ColorWheel width="350" height="350" (colorSelect)="onColorSelected($event)"></ColorWheel>
     <Label [text]="hex" textWrap="true"></Label>
     <Label [text]="rgb" textWrap="true"></Label>
     <Label [text]="userText" textWrap="true"></Label>
+    <Button text="connect" (tap)="connectLight()"></Button>
 
 
     <StackLayout horizontalAlignment="center" (tap)="toggleRecording()">

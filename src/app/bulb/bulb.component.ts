@@ -3,7 +3,7 @@ import {
     SpeechRecognition,
     SpeechRecognitionTranscription,
 } from "nativescript-speech-recognition";
-
+import { Bluetooth, Peripheral } from "@nativescript-community/ble";
 @Component({
     moduleId: module.id,
     selector: "Bulb",
@@ -21,6 +21,10 @@ export class BulbComponent implements OnInit {
     showingTips: boolean = false;
     recognizedText: string;
     private recordingAvailable: boolean;
+    private bluetooth = new Bluetooth();
+    serviceUUID: string = "cc02";
+    characteristicUUID: string = "ee03";
+    deviceUUID: string = "FC:58:FA:C1:76:47";
 
     constructor(private zone: NgZone) {}
 
@@ -33,12 +37,73 @@ export class BulbComponent implements OnInit {
                     this.microphoneEnabled = granted;
                 });
         }, 1000);
+        // this.writeColor("#00FF00");
+        this.bluetooth.isBluetoothEnabled().then((enabled) => {
+            console.log("Bluetooth enabled? " + enabled);
+        });
     }
 
+    writeColor(color) {
+        this.bluetooth.writeWithoutResponse({
+            serviceUUID: this.serviceUUID,
+            characteristicUUID: this.characteristicUUID,
+            peripheralUUID: this.deviceUUID,
+            value: this.hexToRgbToValue(color),
+        });
+    }
+
+    hexToRgbToValue(color) {
+        var c = parseInt(color.substring(1), 16);
+        var r = (c >> 16) & 255;
+        var g = (c >> 8) & 255;
+        var b = c & 255;
+        return new Uint8Array([
+            0x01,
+            g,
+            0x01,
+            0x00,
+            0x01,
+            b,
+            0x01,
+            r,
+            0x01,
+            0x00,
+        ]);
+    }
+
+    connectLight() {
+        this.bluetooth.connect({
+            UUID: this.deviceUUID,
+            onConnected: (peripheral: Peripheral) => {
+                console.log("Connected");
+                this.writeColor("#000000");
+            },
+            onDisconnected: (peripheral: Peripheral) => {
+                console.log("Disconnected");
+            },
+        });
+    }
+
+    disconnectLight() {
+        this.bluetooth
+            .disconnect({
+                UUID: this.deviceUUID,
+            })
+            .then(
+                function () {
+                    console.log("disconnected successfully");
+                },
+                function (err) {
+                    // in this case you're probably best off treating this as a disconnected peripheral though
+                    console.log("disconnection error: " + err);
+                }
+            );
+    }
     onColorSelected($event) {
         const hex = String($event.object.color);
         this.hex = hex;
         this.rgb = this.hexToRGB(String(hex).substr(1, 6)).join(", ");
+        this.writeColor(this.hex);
     }
 
     checkSpeechRecognitionAvailability() {
@@ -140,8 +205,9 @@ export class BulbComponent implements OnInit {
     private colorNameToHex(name: string) {
         const acceptedColors = [
             { name: "red", hex: "#FF0000", rgb: "255, 0 ,0" },
-            { name: "purple", hex: "#800080", rgb: "128, 0, 128" },
+            { name: "magenta", hex: "#800080", rgb: "128, 0, 128" },
             { name: "yellow", hex: "#FFFF00", rgb: "255, 255, 0" },
+            { name: "blue", hex: "#030CFF", rgb: "3, 12, 255" },
         ];
 
         const foundColor = acceptedColors.find(
@@ -152,6 +218,7 @@ export class BulbComponent implements OnInit {
             this.hex = foundColor.hex;
             this.rgb = foundColor.rgb;
             console.log(JSON.stringify(foundColor));
+            this.writeColor(this.hex);
         } else {
             alert({
                 title: `${name}`,
