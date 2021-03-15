@@ -1,10 +1,10 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
 import { NativeScriptModule } from "@nativescript/angular";
+import { NativeScriptColorWheelModule } from "@sergeymell/nativescript-color-wheel/angular";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { ItemsComponent } from "./item/items.component";
-import { ItemDetailComponent } from "./item/item-detail.component";
+import { BulbComponent } from "./bulb/bulb.component";
 
 @NgModule({
     bootstrap: [
@@ -12,12 +12,12 @@ import { ItemDetailComponent } from "./item/item-detail.component";
     ],
     imports: [
         NativeScriptModule,
-        AppRoutingModule
+        AppRoutingModule,
+        NativeScriptColorWheelModule
     ],
     declarations: [
         AppComponent,
-        ItemsComponent,
-        ItemDetailComponent
+        BulbComponent,
     ],
     providers: [],
     schemas: [

@@ -1,0 +1,12 @@
+<StackLayout>
+    <ColorWheel width="400" height="400" (colorSelect)="onColorSelected($event)"></ColorWheel>
+    <Label [text]="hex" textWrap="true"></Label>
+    <Label [text]="rgb" textWrap="true"></Label>
+
+
+    <StackLayout horizontalAlignment="center" (tap)="toggleRecording()">
+        <Label class="mdi record-mic" [class.recording]="recording" text="record" [isEnabled]="!microphoneEnabled"></Label>
+        <Label class="record-hint" text="tap and talk" *ngIf="!recording"></Label>
+        <Label class="record-hint" text="tap again to stop" *ngIf="recording"></Label>
+      </StackLayout>
+</StackLayout>
