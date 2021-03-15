@@ -4,11 +4,13 @@
     <Label [text]="rgb" textWrap="true"></Label>
     <Label [text]="userText" textWrap="true"></Label>
     <Button text="connect" (tap)="connectLight()"></Button>
+    <Button [text]="isAccelerometerListening() ? 'stop updates' : 'start updates'" (tap)="toggleAccelerometer()"></Button>
 
 
     <StackLayout horizontalAlignment="center" (tap)="toggleRecording()">
-        <Label class="mdi record-mic" [class.recording]="recording" text="record" [isEnabled]="!microphoneEnabled"></Label>
-        <Label class="record-hint" text="tap and talk" *ngIf="!recording"></Label>
-        <Label class="record-hint" text="tap again to stop" *ngIf="recording"></Label>
-      </StackLayout>
+      <Label class="mdi record-mic" [class.recording]="recording" text="record" [isEnabled]="!microphoneEnabled"></Label>
+      <Label class="record-hint" text="tap and talk" *ngIf="!recording"></Label>
+      <Label class="record-hint" text="tap again to stop" *ngIf="recording"></Label>
+    </StackLayout>
+
 </StackLayout>

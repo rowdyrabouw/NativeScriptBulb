@@ -1,9 +1,19 @@
 import { Component, NgZone, OnInit } from "@angular/core";
+import { Observable } from "rxjs";
+import { sampleTime } from "rxjs/operators";
+
 import {
     SpeechRecognition,
     SpeechRecognitionTranscription,
 } from "nativescript-speech-recognition";
 import { Bluetooth, Peripheral } from "@nativescript-community/ble";
+import {
+    AccelerometerData,
+    isListening,
+    startAccelerometerUpdates,
+    stopAccelerometerUpdates,
+} from "@triniwiz/nativescript-accelerometer";
+
 @Component({
     moduleId: module.id,
     selector: "Bulb",
@@ -25,6 +35,7 @@ export class BulbComponent implements OnInit {
     serviceUUID: string = "cc02";
     characteristicUUID: string = "ee03";
     deviceUUID: string = "FC:58:FA:C1:76:47";
+    private accelerometer$: Observable<AccelerometerData>;
 
     constructor(private zone: NgZone) {}
 
@@ -37,7 +48,6 @@ export class BulbComponent implements OnInit {
                     this.microphoneEnabled = granted;
                 });
         }, 1000);
-        // this.writeColor("#00FF00");
         this.bluetooth.isBluetoothEnabled().then((enabled) => {
             console.log("Bluetooth enabled? " + enabled);
         });
@@ -50,6 +60,11 @@ export class BulbComponent implements OnInit {
             peripheralUUID: this.deviceUUID,
             value: this.hexToRgbToValue(color),
         });
+    }
+
+    rgbToHex(red, green, blue) {
+        var rgb = blue | (green << 8) | (red << 16);
+        return "#" + (0x1000000 + rgb).toString(16).slice(1);
     }
 
     hexToRgbToValue(color) {
@@ -226,6 +241,50 @@ export class BulbComponent implements OnInit {
                     "Sorry, this color is not present in the list of accepted colors.",
                 okButtonText: "Try again",
             });
+        }
+    }
+
+    coordinateToRgbInteger(value) {
+        // convert value between -1 and +1 to value between 0 and 255
+        return Math.round((value + 1) / 0.00784313725490196);
+    }
+
+    private accelerometerToRgb(data) {
+        const r = this.coordinateToRgbInteger(data.x);
+        const g = this.coordinateToRgbInteger(data.y);
+        const b = this.coordinateToRgbInteger(data.z);
+        this.hex = this.rgbToHex(r, g, b);
+        this.rgb = `${r}, ${g}, ${b}`;
+        this.writeColor(this.hex);
+    }
+
+    start() {
+        this.accelerometer$ = new Observable((observer) => {
+            startAccelerometerUpdates(
+                (data: AccelerometerData) => {
+                    observer.next(data);
+                },
+                { sensorDelay: "normal" }
+            );
+        });
+        this.accelerometer$.pipe(sampleTime(500)).subscribe((data) => {
+            this.accelerometerToRgb(data);
+        });
+    }
+
+    stop() {
+        stopAccelerometerUpdates();
+    }
+
+    isAccelerometerListening() {
+        return isListening();
+    }
+
+    toggleAccelerometer() {
+        if (this.isAccelerometerListening()) {
+            this.stop();
+        } else {
+            this.start();
         }
     }
 

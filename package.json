@@ -33,6 +33,7 @@
     "@nativescript/core": "~7.1.0",
     "@nativescript/theme": "~3.0.0",
     "@sergeymell/nativescript-color-wheel": "^1.0.15",
+    "@triniwiz/nativescript-accelerometer": "^4.0.3",
     "nativescript-speech-recognition": "^2.0.0",
     "reflect-metadata": "~0.1.12",
     "rxjs": "^6.6.0",
