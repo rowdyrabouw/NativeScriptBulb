@@ -1,0 +1,17 @@
+{
+  "name": "nativescript-version-number",
+  "version": "1.0.0",
+  "main": "version-number",
+  "typings": "version-number.d.ts",
+  "nativescript": {
+    "platforms": {
+      "android": "7.0.0",
+      "ios": "7.0.0"
+    }
+  },
+  "author": {
+		"name": "Rowdy Rabouw",
+		"url": "https://rowdy.codes"
+	}
+
+}
