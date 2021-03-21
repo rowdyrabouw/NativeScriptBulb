@@ -3,14 +3,16 @@ import { Routes } from "@angular/router";
 import { NativeScriptRouterModule } from "@nativescript/angular";
 
 import { BulbComponent } from "./bulb/bulb.component";
+import { HomeComponent } from "./home/home.component";
 
 const routes: Routes = [
-    { path: "", redirectTo: "/bulb", pathMatch: "full" },
+    { path: "", redirectTo: "/home", pathMatch: "full" },
+    { path: "home", component: HomeComponent },
     { path: "bulb", component: BulbComponent },
 ];
 
 @NgModule({
     imports: [NativeScriptRouterModule.forRoot(routes)],
-    exports: [NativeScriptRouterModule]
+    exports: [NativeScriptRouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,0 +1,83 @@
+.grid-layout {
+  margin-top: 40;
+}
+
+.action-bar {
+  font-size: 20;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  margin-top: 5;
+  background: linear-gradient(
+    90deg,
+    rgba(63, 218, 216, 1) 0%,
+    rgba(79, 220, 74, 1) 25%,
+    rgba(208, 222, 33, 1) 50%,
+    rgba(255, 154, 0, 1) 75%,
+    rgba(255, 0, 0, 1) 100%
+  );
+}
+
+.title {
+  justify-content: center;
+  align-items: center;
+}
+
+.colorData {
+  width: 90%;
+}
+
+.lbl {
+  color: rgb(0, 0, 0);
+  font-size: 28;
+  font-weight: bold;
+}
+
+.colorBox {
+  border-width: 2;
+  border-color: rgb(0, 0, 0);
+  border-radius: 5;
+  width: 75;
+  height: 75;
+}
+
+.btn {
+  margin-bottom: 20;
+  font-size: 20;
+  font-weight: bold;
+  border-width: 1;
+  border-radius: 5;
+  color: rgb(255, 255, 255);
+  border-color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0);
+  padding: 10;
+}
+
+.btn-primary {
+  border-color: rgb(31, 2, 255);
+  background-color: rgb(31, 2, 255);
+}
+
+.btn-primary-inverse {
+  color: rgb(31, 2, 255);
+  background-color: rgb(255, 255, 255);
+}
+
+.btn-secondary {
+  border-color: rgb(220, 1, 255);
+  background-color: rgb(220, 1, 255);
+}
+
+.btn-secondary-inverse {
+  color: rgb(220, 1, 255);
+  background-color: rgb(255, 255, 255);
+}
+
+.btn-tertiair {
+  border-color: rgb(255, 4, 111);
+  background-color: rgb(255, 4, 111);
+}
+
+.btn-tertiair-inverse {
+  color: rgb(255, 4, 111);
+  background-color: rgb(255, 255, 255);
+}

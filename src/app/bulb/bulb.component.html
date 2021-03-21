@@ -1,16 +1,36 @@
-<StackLayout horizontalAlignment="center">
-    <ColorWheel width="350" height="350" (colorSelect)="onColorSelected($event)"></ColorWheel>
-    <Label [text]="hex" textWrap="true"></Label>
-    <Label [text]="rgb" textWrap="true"></Label>
-    <Label [text]="userText" textWrap="true"></Label>
-    <Button text="connect" (tap)="connectLight()"></Button>
-    <Button [text]="isAccelerometerListening() ? 'stop updates' : 'start updates'" (tap)="toggleAccelerometer()"></Button>
+<ActionBar class="action-bar" title="">
+    <StackLayout horizontalAlignment="center">        
+      <Label text="NativeScript Bulb"></Label>
+    </StackLayout>
+  </ActionBar>
 
+<GridLayout class="grid-layout" columns="*" rows="auto, *, auto" width="90%">
 
-    <StackLayout horizontalAlignment="center" (tap)="toggleRecording()">
-      <Label class="mdi record-mic" [class.recording]="recording" text="record" [isEnabled]="!microphoneEnabled"></Label>
-      <Label class="record-hint" text="tap and talk" *ngIf="!recording"></Label>
-      <Label class="record-hint" text="tap again to stop" *ngIf="recording"></Label>
+    <!-- color wheel -->
+    <ColorWheel row="0" col="0" width="350" height="350" (colorSelect)="onColorSelected($event)"></ColorWheel>
+
+    <!-- results -->
+    <GridLayout class="colorData" row="1" col="0" columns="*, auto" rows="*">
+        <StackLayout row="0" col="0" verticalAlignment="center">
+            <Label class="lbl" [text]="hex" textWrap="true"></Label>
+            <Label class="lbl" [text]="rgb" textWrap="true"></Label>
+        </StackLayout>
+        <StackLayout #colorBox  row="0" col="1" class="colorBox"></StackLayout>
+    </GridLayout>
+
+    <StackLayout row="2" col="0">
+        <!-- bluetooth -->
+        <Button class="btn btn-primary" text="connect bulb" *ngIf="!connected" (tap)="connectLight()"></Button>
+        <Button class="btn btn-primary btn-primary-inverse" text="disconnect bulb" *ngIf="connected" (tap)="disconnectLight()"></Button>
+
+        <!-- accelerometer -->
+        <Button class="btn btn-secondary" *ngIf="!isAccelerometerListening()" text="start accelerometer" (tap)="toggleAccelerometer()"></Button>
+        <Button class="btn btn-secondary btn-secondary-inverse" *ngIf="isAccelerometerListening()" text="stop accelerometer" (tap)="toggleAccelerometer()"></Button>
+
+        <!-- speech recognition -->
+        <Button class="btn btn-tertiair" text="start listening" *ngIf="!recording" (tap)="toggleRecording()"></Button>
+        <Button class="btn btn-tertiair btn-tertiair-inverse" text="stop listening" *ngIf="recording" (tap)="toggleRecording()"></Button>
     </StackLayout>
 
-</StackLayout>
+</GridLayout>
+

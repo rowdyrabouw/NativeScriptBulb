@@ -1,12 +1,26 @@
-import { Component, NgZone, OnInit } from "@angular/core";
+// NativeScript
+import { Color } from "@nativescript/core/color";
+
+// Angular
+import {
+    Component,
+    NgZone,
+    OnInit,
+    AfterViewInit,
+    ElementRef,
+    ViewChild,
+} from "@angular/core";
+
+// RxJS
 import { Observable } from "rxjs";
 import { sampleTime } from "rxjs/operators";
 
+// Plugins
+import { Bluetooth, Peripheral } from "@nativescript-community/ble";
 import {
     SpeechRecognition,
     SpeechRecognitionTranscription,
 } from "nativescript-speech-recognition";
-import { Bluetooth, Peripheral } from "@nativescript-community/ble";
 import {
     AccelerometerData,
     isListening,
@@ -18,14 +32,17 @@ import {
     moduleId: module.id,
     selector: "Bulb",
     templateUrl: "bulb.component.html",
+    styleUrls: ["bulb.component.css"],
 })
-export class BulbComponent implements OnInit {
+export class BulbComponent implements OnInit, AfterViewInit {
+    @ViewChild("colorBox") colorBox: ElementRef;
+
     hex: string;
     rgb: string;
-    userText: string;
     microphoneEnabled: boolean = false;
     private speechRecognition: SpeechRecognition = new SpeechRecognition();
     recording: boolean = false;
+    connected: boolean = false;
     lastTranscription: string = null;
     spoken: boolean = false;
     showingTips: boolean = false;
@@ -36,6 +53,7 @@ export class BulbComponent implements OnInit {
     characteristicUUID: string = "ee03";
     deviceUUID: string = "FC:58:FA:C1:76:47";
     private accelerometer$: Observable<AccelerometerData>;
+    private recordedText: string;
 
     constructor(private zone: NgZone) {}
 
@@ -53,21 +71,34 @@ export class BulbComponent implements OnInit {
         });
     }
 
-    writeColor(color) {
+    ngAfterViewInit() {
+        this.clearColorData();
+    }
+
+    private writeColorToBulb(color) {
         this.bluetooth.writeWithoutResponse({
             serviceUUID: this.serviceUUID,
             characteristicUUID: this.characteristicUUID,
             peripheralUUID: this.deviceUUID,
-            value: this.hexToRgbToValue(color),
+            value: this.hexToRgbUint8Array(color),
         });
     }
 
-    rgbToHex(red, green, blue) {
+    // private utility methods
+    private rgbToHex(red, green, blue): string {
         var rgb = blue | (green << 8) | (red << 16);
         return "#" + (0x1000000 + rgb).toString(16).slice(1);
     }
 
-    hexToRgbToValue(color) {
+    private hexToRgbString(hex: string): string {
+        const rgbArray = hex.substr(1, 6).match(/.{1,2}/g);
+        return `rgb(${parseInt(rgbArray[0], 16)}, ${parseInt(
+            rgbArray[1],
+            16
+        )}, ${parseInt(rgbArray[2], 16)})`;
+    }
+
+    private hexToRgbUint8Array(color) {
         var c = parseInt(color.substring(1), 16);
         var r = (c >> 16) & 255;
         var g = (c >> 8) & 255;
@@ -91,34 +122,45 @@ export class BulbComponent implements OnInit {
             UUID: this.deviceUUID,
             onConnected: (peripheral: Peripheral) => {
                 console.log("Connected");
-                this.writeColor("#000000");
+                this.connected = true;
+                // set bulb to black to emulate 'off'
+                this.writeColorToBulb("#000000");
             },
             onDisconnected: (peripheral: Peripheral) => {
+                this.connected = false;
                 console.log("Disconnected");
             },
         });
     }
 
     disconnectLight() {
+        // set bulb to red
+        this.writeColorToBulb("#F0FF011B");
         this.bluetooth
             .disconnect({
                 UUID: this.deviceUUID,
             })
             .then(
-                function () {
+                () => {
                     console.log("disconnected successfully");
+                    this.connected = false;
+                    this.clearColorData();
                 },
-                function (err) {
+                (err) => {
                     // in this case you're probably best off treating this as a disconnected peripheral though
                     console.log("disconnection error: " + err);
                 }
             );
     }
     onColorSelected($event) {
+        this.clearColorData();
         const hex = String($event.object.color);
-        this.hex = hex;
-        this.rgb = this.hexToRGB(String(hex).substr(1, 6)).join(", ");
-        this.writeColor(this.hex);
+        this.writeColor(hex);
+    }
+
+    writeColor(hex) {
+        this.updateColorData(hex);
+        this.writeColorToBulb(hex);
     }
 
     checkSpeechRecognitionAvailability() {
@@ -157,7 +199,7 @@ export class BulbComponent implements OnInit {
             return;
         }
 
-        this.clearScreen();
+        this.clearColorData();
         this.recording = true;
         this.speechRecognition
             .startListening({
@@ -171,7 +213,7 @@ export class BulbComponent implements OnInit {
                         () => (this.recognizedText = transcription.text)
                     );
                     console.log(`User said: ${transcription.text}`);
-                    this.userText = transcription.text;
+                    this.recordedText = transcription.text;
                     console.log(`User finished?: ${transcription.finished}`);
                 },
             })
@@ -204,19 +246,6 @@ export class BulbComponent implements OnInit {
         this.colorNameToHex(text);
     }
 
-    private hexToRGB(hex) {
-        if (hex.length != 6) {
-            throw "Only six-digit hex colors are allowed.";
-        }
-        const aRgbHex = hex.match(/.{1,2}/g);
-        const aRgb = [
-            parseInt(aRgbHex[0], 16),
-            parseInt(aRgbHex[1], 16),
-            parseInt(aRgbHex[2], 16),
-        ];
-        return aRgb;
-    }
-
     private colorNameToHex(name: string) {
         const acceptedColors = [
             { name: "red", hex: "#FF0000", rgb: "255, 0 ,0" },
@@ -232,8 +261,8 @@ export class BulbComponent implements OnInit {
         if (foundColor) {
             this.hex = foundColor.hex;
             this.rgb = foundColor.rgb;
-            console.log(JSON.stringify(foundColor));
-            this.writeColor(this.hex);
+            this.updateColorData(this.hex);
+            this.writeColorToBulb(this.hex);
         } else {
             alert({
                 title: `${name}`,
@@ -242,6 +271,13 @@ export class BulbComponent implements OnInit {
                 okButtonText: "Try again",
             });
         }
+    }
+
+    private updateColorData(hex) {
+        this.hex = hex;
+        this.rgb = this.hexToRgbString(hex);
+        this.colorBox.nativeElement.style.backgroundColor = new Color(hex);
+        this.colorBox.nativeElement.style.visibility = "visible";
     }
 
     coordinateToRgbInteger(value) {
@@ -253,12 +289,14 @@ export class BulbComponent implements OnInit {
         const r = this.coordinateToRgbInteger(data.x);
         const g = this.coordinateToRgbInteger(data.y);
         const b = this.coordinateToRgbInteger(data.z);
-        this.hex = this.rgbToHex(r, g, b);
-        this.rgb = `${r}, ${g}, ${b}`;
-        this.writeColor(this.hex);
+        const hex = this.rgbToHex(r, g, b);
+        // this.rgb = `${r}, ${g}, ${b}`;
+        // this.updateColorData(hex);
+        this.writeColorToBulb(hex);
     }
 
     start() {
+        this.clearColorData();
         this.accelerometer$ = new Observable((observer) => {
             startAccelerometerUpdates(
                 (data: AccelerometerData) => {
@@ -288,9 +326,10 @@ export class BulbComponent implements OnInit {
         }
     }
 
-    private clearScreen() {
+    private clearColorData() {
         this.hex = null;
         this.rgb = null;
-        this.userText = null;
+        this.recordedText = null;
+        this.colorBox.nativeElement.style.visibility = "hidden";
     }
 }

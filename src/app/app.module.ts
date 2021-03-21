@@ -4,24 +4,18 @@ import { NativeScriptColorWheelModule } from "@sergeymell/nativescript-color-whe
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
+import { HomeComponent } from "./home/home.component";
 import { BulbComponent } from "./bulb/bulb.component";
 
 @NgModule({
-    bootstrap: [
-        AppComponent
-    ],
+    bootstrap: [AppComponent],
     imports: [
         NativeScriptModule,
         AppRoutingModule,
-        NativeScriptColorWheelModule
+        NativeScriptColorWheelModule,
     ],
-    declarations: [
-        AppComponent,
-        BulbComponent,
-    ],
+    declarations: [AppComponent, HomeComponent, BulbComponent],
     providers: [],
-    schemas: [
-        NO_ERRORS_SCHEMA
-    ]
+    schemas: [NO_ERRORS_SCHEMA],
 })
-export class AppModule { }
+export class AppModule {}
