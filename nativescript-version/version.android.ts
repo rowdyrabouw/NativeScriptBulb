@@ -1,7 +1,6 @@
 import { Application } from "@nativescript/core";
 
 declare let android: any;
-declare let java: any;
 
 export class Version {
     constructor() {}

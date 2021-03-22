@@ -17,10 +17,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
-        const version = new Version();
-        const versionNumber = version.getVersion();
-        console.log("version", version);
-        this.version = versionNumber;
+        this.version = new Version().getVersion();
     }
 
     goToBulbDemo() {
