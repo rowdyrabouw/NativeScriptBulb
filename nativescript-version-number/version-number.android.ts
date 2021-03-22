@@ -1,4 +1,4 @@
-import * as application from "tns-core-modules/application";
+import * as application from "@nativescript/core/application";
 
 declare let android: any;
 declare let java: any;
@@ -14,6 +14,6 @@ export class VersionNumber {
                 application.android.context.getPackageName(),
                 PackageManager.GET_META_DATA
             );
-        return java.lang.Integer.toString(pkg.versionCode);
+        return java.lang.Integer.toString(pkg.versionName);
     }
 }
