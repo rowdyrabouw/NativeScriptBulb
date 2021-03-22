@@ -1,4 +1,4 @@
-export declare class VersionNumber {
+export declare class Version {
     constructor();
 
     getVersion(): string;

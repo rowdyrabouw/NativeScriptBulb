@@ -1,8 +1,8 @@
 {
-  "name": "nativescript-version-number",
+  "name": "nativescript-version",
   "version": "1.0.0",
-  "main": "version-number",
-  "typings": "version-number.d.ts",
+  "main": "version",
+  "typings": "version.d.ts",
   "nativescript": {
     "platforms": {
       "android": "7.0.0",
@@ -13,5 +13,4 @@
 		"name": "Rowdy Rabouw",
 		"url": "https://rowdy.codes"
 	}
-
 }

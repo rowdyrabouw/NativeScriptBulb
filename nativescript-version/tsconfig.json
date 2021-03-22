@@ -9,17 +9,8 @@
     "noEmitOnError": true,
     "skipLibCheck": true,
     "lib": ["es2018", "es2017", "dom", "es6"],
-    "baseUrl": ".",
-    "paths": {
-      "~/*": ["src/*"]
-    }
   },
-  "include": [
-    "src/tests/**/*.ts",
-    "src/**/*.ios.ts",
-    "src/**/*.android.ts",
-    "nativescript-version/*.ts"
-  ],
-  "files": ["./references.d.ts", "./src/main.ts"],
-  "exclude": ["node_modules", "platforms", "e2e"]
+  "files": ["version.ts"],
+  "exclude": ["node_modules"],
+  "compileOnSave": false
 }

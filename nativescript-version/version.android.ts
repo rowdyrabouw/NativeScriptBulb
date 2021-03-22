@@ -1,19 +1,19 @@
-import * as application from "@nativescript/core/application";
+import { Application } from "@nativescript/core";
 
 declare let android: any;
 declare let java: any;
 
-export class VersionNumber {
+export class Version {
     constructor() {}
 
     getVersion(): string {
         let PackageManager = android.content.pm.PackageManager;
-        let pkg = application.android.context
+        let pkg = Application.android.context
             .getPackageManager()
             .getPackageInfo(
-                application.android.context.getPackageName(),
+                Application.android.context.getPackageName(),
                 PackageManager.GET_META_DATA
             );
-        return java.lang.Integer.toString(pkg.versionName);
+        return pkg.versionName;
     }
 }

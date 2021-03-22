@@ -1,6 +1,6 @@
 declare let NSBundle: any;
 
-export class VersionNumber {
+export class Version {
     constructor() {}
 
     getVersion(): string {

@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { Page } from "@nativescript/core/ui/page";
 
-import { VersionNumber } from "nativescript-version-number";
+import { Version } from "nativescript-version";
 
 @Component({
     selector: "Home",
@@ -17,7 +17,10 @@ export class HomeComponent implements OnInit {
 
     ngOnInit(): void {
         this.page.actionBarHidden = true;
-        this.version = new VersionNumber().getVersion();
+        const version = new Version();
+        const versionNumber = version.getVersion();
+        console.log("version", version);
+        this.version = versionNumber;
     }
 
     goToBulbDemo() {
