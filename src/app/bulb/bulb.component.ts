@@ -134,8 +134,6 @@ export class BulbComponent implements OnInit, AfterViewInit {
     }
 
     disconnectLight() {
-        // set bulb to red
-        this.writeColorToBulb("#F0FF011B");
         this.bluetooth
             .disconnect({
                 UUID: this.deviceUUID,
@@ -248,7 +246,6 @@ export class BulbComponent implements OnInit, AfterViewInit {
 
     private colorNameToHex(name: string) {
         const acceptedColors = [
-            { name: "red", hex: "#FF0000", rgb: "255, 0 ,0" },
             { name: "magenta", hex: "#800080", rgb: "128, 0, 128" },
             { name: "yellow", hex: "#FFFF00", rgb: "255, 255, 0" },
             { name: "blue", hex: "#030CFF", rgb: "3, 12, 255" },
@@ -290,8 +287,6 @@ export class BulbComponent implements OnInit, AfterViewInit {
         const g = this.coordinateToRgbInteger(data.y);
         const b = this.coordinateToRgbInteger(data.z);
         const hex = this.rgbToHex(r, g, b);
-        // this.rgb = `${r}, ${g}, ${b}`;
-        // this.updateColorData(hex);
         this.writeColorToBulb(hex);
     }
 
