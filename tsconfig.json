@@ -14,12 +14,7 @@
       "~/*": ["src/*"]
     }
   },
-  "include": [
-    "src/tests/**/*.ts",
-    "src/**/*.ios.ts",
-    "src/**/*.android.ts",
-    "nativescript-version-number"
-  ],
+  "include": ["src/tests/**/*.ts", "src/**/*.ios.ts", "src/**/*.android.ts"],
   "files": ["./references.d.ts", "./src/main.ts"],
   "exclude": ["node_modules", "platforms", "e2e"]
 }
