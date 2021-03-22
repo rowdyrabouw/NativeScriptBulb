@@ -1,7 +1,11 @@
-import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+// NativeScript
 import { Page } from "@nativescript/core/ui/page";
 
+// Angular
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+
+// Plugins
 import { Version } from "nativescript-version";
 
 @Component({

@@ -37,23 +37,27 @@ import {
 export class BulbComponent implements OnInit, AfterViewInit {
     @ViewChild("colorBox") colorBox: ElementRef;
 
+    // ui
     hex: string;
     rgb: string;
-    microphoneEnabled: boolean = false;
-    private speechRecognition: SpeechRecognition = new SpeechRecognition();
     recording: boolean = false;
     connected: boolean = false;
-    lastTranscription: string = null;
-    spoken: boolean = false;
-    showingTips: boolean = false;
-    recognizedText: string;
-    private recordingAvailable: boolean;
+
+    // bluetooth
     private bluetooth = new Bluetooth();
-    serviceUUID: string = "cc02";
-    characteristicUUID: string = "ee03";
-    deviceUUID: string = "FC:58:FA:C1:76:47";
+    private serviceUUID: string = "cc02";
+    private characteristicUUID: string = "ee03";
+    private deviceUUID: string = "FC:58:FA:C1:76:47";
+
+    // speech recognition
+    private speechRecognition: SpeechRecognition = new SpeechRecognition();
+    private recordingAvailable: boolean;
+    private lastTranscription: string = null;
+    private spoken: boolean = false;
+    private recognizedText: string;
+
+    // accelerometer
     private accelerometer$: Observable<AccelerometerData>;
-    private recordedText: string;
 
     constructor(private zone: NgZone) {}
 
@@ -63,11 +67,11 @@ export class BulbComponent implements OnInit, AfterViewInit {
             this.speechRecognition
                 .requestPermission()
                 .then((granted: boolean) => {
-                    this.microphoneEnabled = granted;
+                    console.log("Microphone enabled?", granted);
                 });
         }, 1000);
         this.bluetooth.isBluetoothEnabled().then((enabled) => {
-            console.log("Bluetooth enabled? " + enabled);
+            console.log("Bluetooth enabled? ", enabled);
         });
     }
 
@@ -75,48 +79,32 @@ export class BulbComponent implements OnInit, AfterViewInit {
         this.clearColorData();
     }
 
-    private writeColorToBulb(color) {
-        this.bluetooth.writeWithoutResponse({
-            serviceUUID: this.serviceUUID,
-            characteristicUUID: this.characteristicUUID,
-            peripheralUUID: this.deviceUUID,
-            value: this.hexToRgbUint8Array(color),
-        });
+    // ui
+    onColorSelected($event) {
+        this.clearColorData();
+        const hex = String($event.object.color);
+        this.writeColor(hex);
     }
 
-    // private utility methods
-    private rgbToHex(red, green, blue): string {
-        var rgb = blue | (green << 8) | (red << 16);
-        return "#" + (0x1000000 + rgb).toString(16).slice(1);
+    private writeColor(hex) {
+        this.updateColorData(hex);
+        this.writeColorToBulb(hex);
     }
 
-    private hexToRgbString(hex: string): string {
-        const rgbArray = hex.substr(1, 6).match(/.{1,2}/g);
-        return `rgb(${parseInt(rgbArray[0], 16)}, ${parseInt(
-            rgbArray[1],
-            16
-        )}, ${parseInt(rgbArray[2], 16)})`;
+    private updateColorData(hex) {
+        this.hex = hex;
+        this.rgb = this.hexToRgbString(hex);
+        this.colorBox.nativeElement.style.backgroundColor = new Color(hex);
+        this.colorBox.nativeElement.style.visibility = "visible";
     }
 
-    private hexToRgbUint8Array(color) {
-        var c = parseInt(color.substring(1), 16);
-        var r = (c >> 16) & 255;
-        var g = (c >> 8) & 255;
-        var b = c & 255;
-        return new Uint8Array([
-            0x01,
-            g,
-            0x01,
-            0x00,
-            0x01,
-            b,
-            0x01,
-            r,
-            0x01,
-            0x00,
-        ]);
+    private clearColorData() {
+        this.hex = null;
+        this.rgb = null;
+        this.colorBox.nativeElement.style.visibility = "hidden";
     }
 
+    // bluetooth
     connectLight() {
         this.bluetooth.connect({
             UUID: this.deviceUUID,
@@ -150,18 +138,18 @@ export class BulbComponent implements OnInit, AfterViewInit {
                 }
             );
     }
-    onColorSelected($event) {
-        this.clearColorData();
-        const hex = String($event.object.color);
-        this.writeColor(hex);
+
+    private writeColorToBulb(color) {
+        this.bluetooth.writeWithoutResponse({
+            serviceUUID: this.serviceUUID,
+            characteristicUUID: this.characteristicUUID,
+            peripheralUUID: this.deviceUUID,
+            value: this.hexToRgbUint8Array(color),
+        });
     }
 
-    writeColor(hex) {
-        this.updateColorData(hex);
-        this.writeColorToBulb(hex);
-    }
-
-    checkSpeechRecognitionAvailability() {
+    // speech recognition
+    private checkSpeechRecognitionAvailability() {
         this.speechRecognition.available().then(
             (available: boolean) => (this.recordingAvailable = available),
             (err: string) => console.log(err)
@@ -177,26 +165,22 @@ export class BulbComponent implements OnInit, AfterViewInit {
         } else {
             this.stopListening();
             if (!this.spoken && this.lastTranscription !== null) {
-                console.log("stop");
-                console.log(this.lastTranscription);
+                console.log("User said?", this.lastTranscription);
                 this.colorNameToHex(this.lastTranscription);
             }
         }
     }
+
     private startListening(): void {
         if (!this.recordingAvailable) {
             alert({
                 title: "Not supported",
-                message:
-                    "Speech recognition not supported on this device. Try a different device please.",
+                message: "Speech recognition not supported on this device.",
                 okButtonText: "Oh, bummer",
             });
-            this.recognizedText = "No support 😟, but try the tips below!";
             this.recording = false;
-            this.showingTips = true;
             return;
         }
-
         this.clearColorData();
         this.recording = true;
         this.speechRecognition
@@ -211,7 +195,6 @@ export class BulbComponent implements OnInit, AfterViewInit {
                         () => (this.recognizedText = transcription.text)
                     );
                     console.log(`User said: ${transcription.text}`);
-                    this.recordedText = transcription.text;
                     console.log(`User finished?: ${transcription.finished}`);
                 },
             })
@@ -240,8 +223,81 @@ export class BulbComponent implements OnInit, AfterViewInit {
 
     private processSpokenTextInput() {
         let text = this.recognizedText;
-        console.log(text);
+        console.log("recognizedText", text);
         this.colorNameToHex(text);
+    }
+
+    // accelerometer
+    toggleAccelerometer() {
+        if (this.isAccelerometerListening()) {
+            this.stopAccelerometer();
+        } else {
+            this.startAccelerometer();
+        }
+    }
+
+    private startAccelerometer() {
+        this.clearColorData();
+        this.accelerometer$ = new Observable((observer) => {
+            startAccelerometerUpdates(
+                (data: AccelerometerData) => {
+                    observer.next(data);
+                },
+                { sensorDelay: "normal" }
+            );
+        });
+        this.accelerometer$.pipe(sampleTime(500)).subscribe((data) => {
+            this.accelerometerToRgb(data);
+        });
+    }
+
+    private stopAccelerometer() {
+        stopAccelerometerUpdates();
+    }
+
+    isAccelerometerListening() {
+        return isListening();
+    }
+
+    private accelerometerToRgb(data) {
+        const r = this.coordinateToRgbInteger(data.x);
+        const g = this.coordinateToRgbInteger(data.y);
+        const b = this.coordinateToRgbInteger(data.z);
+        const hex = this.rgbToHex(r, g, b);
+        this.writeColorToBulb(hex);
+    }
+
+    // utilities
+    private rgbToHex(red, green, blue): string {
+        var rgb = blue | (green << 8) | (red << 16);
+        return "#" + (0x1000000 + rgb).toString(16).slice(1);
+    }
+
+    private hexToRgbString(hex: string): string {
+        const rgbArray = hex.substr(1, 6).match(/.{1,2}/g);
+        return `rgb(${parseInt(rgbArray[0], 16)}, ${parseInt(
+            rgbArray[1],
+            16
+        )}, ${parseInt(rgbArray[2], 16)})`;
+    }
+
+    private hexToRgbUint8Array(color) {
+        var c = parseInt(color.substring(1), 16);
+        var r = (c >> 16) & 255;
+        var g = (c >> 8) & 255;
+        var b = c & 255;
+        return new Uint8Array([
+            0x01,
+            g,
+            0x01,
+            0x00,
+            0x01,
+            b,
+            0x01,
+            r,
+            0x01,
+            0x00,
+        ]);
     }
 
     private colorNameToHex(name: string) {
@@ -270,61 +326,8 @@ export class BulbComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private updateColorData(hex) {
-        this.hex = hex;
-        this.rgb = this.hexToRgbString(hex);
-        this.colorBox.nativeElement.style.backgroundColor = new Color(hex);
-        this.colorBox.nativeElement.style.visibility = "visible";
-    }
-
-    coordinateToRgbInteger(value) {
+    private coordinateToRgbInteger(value) {
         // convert value between -1 and +1 to value between 0 and 255
         return Math.round((value + 1) / 0.00784313725490196);
-    }
-
-    private accelerometerToRgb(data) {
-        const r = this.coordinateToRgbInteger(data.x);
-        const g = this.coordinateToRgbInteger(data.y);
-        const b = this.coordinateToRgbInteger(data.z);
-        const hex = this.rgbToHex(r, g, b);
-        this.writeColorToBulb(hex);
-    }
-
-    start() {
-        this.clearColorData();
-        this.accelerometer$ = new Observable((observer) => {
-            startAccelerometerUpdates(
-                (data: AccelerometerData) => {
-                    observer.next(data);
-                },
-                { sensorDelay: "normal" }
-            );
-        });
-        this.accelerometer$.pipe(sampleTime(500)).subscribe((data) => {
-            this.accelerometerToRgb(data);
-        });
-    }
-
-    stop() {
-        stopAccelerometerUpdates();
-    }
-
-    isAccelerometerListening() {
-        return isListening();
-    }
-
-    toggleAccelerometer() {
-        if (this.isAccelerometerListening()) {
-            this.stop();
-        } else {
-            this.start();
-        }
-    }
-
-    private clearColorData() {
-        this.hex = null;
-        this.rgb = null;
-        this.recordedText = null;
-        this.colorBox.nativeElement.style.visibility = "hidden";
     }
 }
