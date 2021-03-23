@@ -1,6 +1,6 @@
 # NativeScript Bulb
 
-NativeScript 7 with Angular 11 demo project for my talk _**Unleash your web skills on native!**_
+NativeScript 7 with Angular 11 demo project for my talk _**Unleash your web skills on native!**_ for [WeAreDevelopers Live Days (online)](rowdy.codes/wad).
 
 Including:
 
