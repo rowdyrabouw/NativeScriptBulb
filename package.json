@@ -1,23 +1,13 @@
 {
-  "name": "@nativescript/template-hello-world-ng",
+  "name": "nativescript-bulb",
   "main": "main.js",
-  "version": "7.0.10",
-  "author": "NativeScript Team <oss@nativescript.org>",
-  "description": "NativeScript Application",
-  "license": "SEE LICENSE IN <your-license-filename>",
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "nativescript",
-    "mobile",
-    "angular",
-    "{N}",
-    "template"
-  ],
-  "repository": "<fill-your-repository-here>",
+  "version": "1.0.0",
+  "author": "Rowdy Rabouw <rowdy@double-r.nl>",
+  "description": "NativeScript 7 with Angular 11 demo project",
+  "license": "ISC",
+  "repository": "https://github.com/rowdyrabouw/nativescriptbulb",
   "bugs": {
-    "url": "https://github.com/NativeScript/NativeScript/issues"
+    "url": "https://github.com/rowdyrabouw/NativeScriptBulb/issues"
   },
   "dependencies": {
     "@angular/animations": "~11.0.0",
@@ -49,6 +39,5 @@
     "@ngtools/webpack": "~11.0.0",
     "typescript": "~4.0.0"
   },
-  "private": "true",
-  "readme": "NativeScript Application"
+  "private": "true"
 }
